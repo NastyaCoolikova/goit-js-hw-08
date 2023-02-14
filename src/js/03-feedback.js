@@ -9,10 +9,13 @@ const refs = {
 };
 
 refs.form.addEventListener('submit', onFormSubmit);
-refs.form.addEventListener('input', throttle(onTextInput,500));
+refs.textarea.addEventListener('input', throttle(onTextInput,500));
+refs.email.addEventListener('input', throttle(onTextInput,500));
 
 function onFormSubmit(evt) {
     evt.preventDefault();
+
+    console.log(formData);
 
     evt.currentTarget.reset();
     localStorage.removeItem(key)
@@ -27,17 +30,26 @@ function fillTextarea() {
 
         if(parsedData.email) {
             refs.email.value = parsedData.email;
+            formData.email = parsedData.email;
         }
         
         if(parsedData.message) {
             refs.textarea.value = parsedData.message;
+            formData.message = parsedData.message;
         }
     }
 };
 
 function onTextInput(evt) {
     formData[evt.target.name] = evt.target.value;
-    console.log(formData);
-    localStorage.setItem(key, JSON.stringify(formData));
-};
+    
+    const savedMessage = localStorage.getItem(key);
+    const parseMessage = JSON.parse(savedMessage);
 
+    if(parseMessage != null) {
+        parseMessage[evt.target.name] = evt.target.value;
+        localStorage.setItem(key, JSON.stringify(parseMessage));
+    } else {
+        localStorage.setItem(key, JSON.stringify(formData));
+    }
+}
